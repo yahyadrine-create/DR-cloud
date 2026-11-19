@@ -6,6 +6,7 @@ import {HardDriveIcon,UserIcon,Trash2Icon,PlusIcon,HardDriveUploadIcon,FolderPlu
 import { Dropdown, DropdownItem } from '../ui/Dropdown';
 import { ProgressBar } from '../ui/ProgressBar';
 import { formatBytes } from '../../assets/assets';
+import { useDrive } from '../../hooks/UseDrive';
 
 const SideBar = ({
   onCreateFolderClick,
@@ -13,7 +14,7 @@ const SideBar = ({
   setIsMobileOpen
 }) => {
 
-  const isUploading = false;
+  const {isUploading , uploadFiles} = useDrive()
 
   const { user, currentFolderId } = useApp();
   const location = useLocation();
@@ -23,6 +24,13 @@ const SideBar = ({
   const storage_limit = Number(user?.storage_limit ?? 1073741824);
 
   const storage_percentage = Math.min(100,Math.round((storage_used / storage_limit) * 100));
+
+  const handelFilesSelect = (e)=>{
+      if (e.target.files && e.target.files.length > 0){
+        uploadFiles(e.target.files, currentFolderId);
+        e.target.value = "";
+      }
+  }
 
   const navItems = [
     { label: 'My Drive', path: '/', icon: HardDriveIcon },
@@ -73,6 +81,7 @@ const SideBar = ({
             ref={fileInputRef}
             multiple
             className="hidden"
+            onChange={handelFilesSelect}
           />
 
           <Dropdown
